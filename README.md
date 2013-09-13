@@ -2,5 +2,5 @@
 make
 
 2. Run:
-./xor -i input -o output -k key
+./xor -i input -o output (-k key|-p padfile)
 
