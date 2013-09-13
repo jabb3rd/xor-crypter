@@ -5,14 +5,14 @@
 
 void usage(char *str)
 {
-	fprintf(stderr, "Usage: %s -i <input> -o <output> -k <key>\n", str);
+	fprintf(stderr, "Usage: %s -i <input> -o <output> (-k <key> | -p <padfile>)\n", str);
 }
 
 int main(int argc, char **argv)
 {
-	FILE *in = NULL, *out = NULL;
-	int c;
+	FILE *in = NULL, *out = NULL, *pad = NULL;
 	char *key = NULL;
+	int c;
         opterr = 0;
 
 	/* Not enough command line parameters */
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-        while ((c = getopt(argc, argv, "i:o:k:")) != -1)
+        while ((c = getopt(argc, argv, "i:o:k:p:")) != -1)
                 switch (c) {
 			/* Input */
                         case 'i':
@@ -39,6 +39,11 @@ int main(int argc, char **argv)
 				key = malloc(sizeof(char)*strlen(optarg));
 				strcpy(key, optarg);
 				break;
+			/* One-time pad */
+			case 'p':
+				fprintf(stderr, "pad = %s\n", optarg);
+				pad = fopen(optarg, "rb");
+				break;
 			/* Everything else */
                         case '?':
                         default:
@@ -47,7 +52,7 @@ int main(int argc, char **argv)
                 }
 
 	/* Make an extra check before I/O operations */
-	if (in == NULL || out == NULL || key == NULL) {
+	if (in == NULL || out == NULL) {
 		if (in != NULL)
 			fclose(in);
 		if (out != NULL)
@@ -56,9 +61,31 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	xor_encode(in, out, key);
+	if (key == NULL && pad == NULL) {
+		fprintf(stderr, "Key error!\n");
+		usage(argv[0]);
+		if (pad != NULL)
+		    fclose(pad);
+		return 1;
+	}
 
+	if (key != NULL && pad != NULL) {
+		fprintf(stderr, "Both pad file and key are given, we need only one of them!\n");
+		usage(argv[0]);
+		fclose(pad);
+		return 1;
+	}
+
+	/* Do the main stuff */
+	if (key != NULL)
+		xor_encode(in, out, key);
+	else if (pad != NULL) {
+		xor_encode_pad(in, out, pad);
+		fclose(pad);
+	}
 	fclose(in);
 	fclose(out);
+
+	fprintf(stderr, "Done.\n");
 	return 0;
 }

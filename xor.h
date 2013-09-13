@@ -6,6 +6,6 @@
 typedef unsigned char byte;
 
 int xor_encode(FILE *in, FILE *out, char *key);
+int xor_encode_pad(FILE *in, FILE *out, FILE *pad);
 
 #endif /* __XOR_H */
-
