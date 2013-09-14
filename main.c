@@ -90,6 +90,7 @@ int main(int argc, char **argv)
 					fprintf(stderr, "Error reading key (size mismatch)!\n");
 					return 1;
 				}
+				fclose(key);
 				key_given = 1;
 				break;
 			/* One-time pad */
@@ -120,10 +121,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Do the main stuff */
-	if (key_data) {
-		xor_encode(in, out, key_data, key_size);
-		free(key_data);
-	} else if (key) {
+	if (key_data || key) {
 		xor_encode(in, out, key_data, key_size);
 		free(key_data);
 	} else if (pad) {
