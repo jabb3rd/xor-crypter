@@ -3,21 +3,19 @@
 #include "xor.h"
 
 /* XOR input file with the key data and write to the output */
-int xor_encode(FILE *in, FILE *out, char *key)
+int xor_encode(FILE *in, FILE *out, byte *key, size_t keysize)
 {
-	size_t i, nread;
 	byte buffer[BUFSIZE];
-	size_t k, kl;
+	size_t i, nread, k;
 
 	k = 0;
-	kl = strlen(key);
 	do {
 
 		nread = fread(buffer, sizeof(byte), BUFSIZE, in);
 		for (i = 0; i < nread; i++) {
 			buffer[i] ^= key[k++];
 			/* Cycle through the key data */
-			if (k >= kl) k = 0;
+			if (k >= keysize) k = 0;
 		}
 		fwrite(buffer, sizeof(byte), nread, out);
 	} while (nread);
