@@ -33,8 +33,13 @@ int main(int argc, char **argv)
                 switch (c) {
 			/* Input */
                         case 'i':
-                                fprintf(stderr, "input = %s\n", optarg);
-				in = fopen(optarg, "rb");
+                                if (!strcmp(optarg, "-")) {
+					fprintf(stderr, "input = stdin\n");
+					in = stdin;
+				} else {
+					fprintf(stderr, "input = %s\n", optarg);
+					in = fopen(optarg, "rb");
+				}
 				if (!in) {
 					fprintf(stderr, "Error opening input file\n");
 					return 1;
@@ -42,8 +47,13 @@ int main(int argc, char **argv)
                                 break;
 			/* Output */
                         case 'o':
-				fprintf(stderr, "output = %s\n", optarg);
-				out = fopen(optarg, "wb");
+				if (!strcmp(optarg, "-")) {
+					fprintf(stderr, "output = stdout\n");
+					out = stdout;
+				} else {
+					fprintf(stderr, "output = %s\n", optarg);
+					out = fopen(optarg, "wb");
+				}
 				if (!out) {
 					fprintf(stderr, "Error opening output file\n");
 					return 1;
